@@ -15,24 +15,62 @@ router.get('/', (req, res) => {
   res.status(200).json(posts);
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
   const {
     params: { id },
   } = req;
 
   const post = posts.find((post) => post.id === parseInt(id));
-  if (!post)
-    return res
-      .status(404)
-      .json({ msg: `A Post with id of ${id} was not found` });
+  if (!post) {
+    const error = new Error(`A Post with id of ${id} was not found`);
+    error.status = 404;
+    return next(error);
+  }
+
   res.json([post]);
 });
-router.post('/', (req, res) => {
-  const { body } = req;
 
-  console.log(body);
+router.post('/', (req, res, next) => {
+  const {
+    body: { title },
+  } = req;
 
-  res.status(201).json('Success');
+  const newPost = { id: posts.length + 1, title };
+  if (!newPost.title) {
+    const error = new Error(`Please include a title`);
+    error.status = 400;
+    return next(error);
+  }
+
+  posts.push(newPost);
+  res.status(201).json(posts);
+});
+
+router.put('/:id', (req, res, next) => {
+  const id = parseInt(req.params.id);
+  const post = posts.find((post) => post.id === id);
+
+  if (!post) {
+    const error = new Error(`A Post with id of ${id} was not found`);
+    error.status = 404;
+    return next(error);
+  }
+  post.title = req.body.title;
+  res.status(200).json(posts);
+});
+
+router.delete('/:id', (req, res, next) => {
+  const id = parseInt(req.params.id);
+  const postIndex = posts.findIndex((post) => post.id === id);
+
+  if (postIndex === -1) {
+    const error = new Error(`A Post with id of ${id} was not found`);
+    error.status = 404;
+    return next(error);
+  }
+
+  posts.splice(postIndex, 1);
+  res.status(200).json(posts);
 });
 
 // module.exports = router;

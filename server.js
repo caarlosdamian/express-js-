@@ -1,33 +1,17 @@
-const express = require('express');
-const path = require('path');
+// const express = require('express');
+// const path = require('path');
+// const router = require('./routes/index');
+import express from 'express';
+import router from './routes/index.mjs';
+// const posts = require('./routes/posts');
 
 const app = express();
-
-let posts = [
-  { id: 1, title: 'Post 1' },
-  { id: 2, title: 'Post 2' },
-  { id: 3, title: 'Post 3' },
-  { id: 4, title: 'Post 4' },
-];
+app.use(express.json());
+app.use(router);
 
 // setup static folder
 
 // app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/api/posts/', (req, res) => {
-  const limit = parseInt(req.query.limit);
-  if (!isNaN(limit) && limit > 0) return res.json(posts.slice(0, limit));
-  res.json(posts);
-});
-
-app.get('/api/posts/:id', (req, res) => {
-  const {
-    params: { id },
-  } = req;
-
-  const post = posts.find((post) => post.id === parseInt(id));
-  res.json([post]);
-});
 
 // app.get('/', (req, res) => {
 //   res.sendFile(path.join(__dirname, 'public', 'index.html'));
